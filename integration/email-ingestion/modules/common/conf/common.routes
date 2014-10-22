@@ -1,0 +1,13 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# These are common routes that you may want all services to respond to.
+
+#GET     /api-docs               controllers.ApiHelpController.getResources
+#GET     /api   					controllers.common.Application.api()
+#GET     /assets/*file               controllers.common.Assets.at(path="/public", file)
+
+GET   /status          controllers.common.Application.status()
+#Play doesn't seem to automatically handle the additional path separator so need to add this
+GET   /status/         controllers.common.Application.status()

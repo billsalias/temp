@@ -1,0 +1,22 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET        /                          controllers.Application.index()
+
+GET        /bars                      @controllers.Application.listBars
+
+GET        /contact                   @controllers.Application.listContact
+GET        /contact/:firstName        @controllers.Application.listContacts(firstName: String)
+
+GET        /admin/metrics             com.kenshoo.play.metrics.MetricsController.metrics
+
+GET        /status                    controllers.common.Application.status()
+
+->         /                          common.Routes
+
+->         /api                       api.Routes
+
+# Map static resources from the /public folder to the /assets URL path
+GET        /assets/*file              controllers.Assets.at(path="/public", file)
