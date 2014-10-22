@@ -1,4 +1,4 @@
-name := """SubProject-Template"""
+name := "EmailIngestion"
 
 version := "0.9-SNAPSHOT"
 

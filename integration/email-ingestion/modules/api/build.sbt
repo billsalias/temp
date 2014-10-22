@@ -1,4 +1,4 @@
-name := "SubProject-api"
+name := "EmailIngestionApi"
 
 version := "0.9-SNAPSHOT"
 

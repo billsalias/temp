@@ -1,4 +1,4 @@
-name := "SubProject-common"
+name := "EmailIngestionCommon"
 
 version := "0.9-SNAPSHOT"
 

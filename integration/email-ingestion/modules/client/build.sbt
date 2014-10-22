@@ -1,4 +1,4 @@
-name := "EmailIntegrationClient"
+name := "EmailIngestionClient"
 
 version := "0.9-SNAPSHOT"
 
