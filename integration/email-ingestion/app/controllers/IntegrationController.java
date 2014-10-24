@@ -2,7 +2,6 @@ package controllers;
 
 import javax.annotation.Resource;
 
-import org.apache.http.impl.cookie.BrowserCompatSpecFactory.SecurityLevel;
 import org.springframework.stereotype.Service;
 
 import play.libs.Json;
@@ -51,5 +50,14 @@ public class IntegrationController extends Controller {
 		// Get the requested integrations and return them as JSON
 		return ok(Json.toJson(integrationService
 				.listIntegrationsByOrganization(orgId, offset, batchSize)));
+	}
+	
+	/**
+	 * 
+	 * @param orgId
+	 * @return
+	 */
+	public Result addIntegration(Long orgId) {
+		return ok("OK");
 	}
 }

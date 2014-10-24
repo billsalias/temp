@@ -2,12 +2,12 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET			/v1/integration/:orgId		@controllers.IntegrationController.listIntegrations(:orgId,offset,batchSize)
-
-POST		/v1/integration/:orgId		@controllers.IntegrationController.addIntegration(:orgId)
-
 # Home page
 GET        /                          controllers.Application.index()
+
+GET			/v1/integration/:orgId		@controllers.IntegrationController.listIntegrations(orgId:Long, offset:Integer?=0,batchSize:Integer?=20)
+
+POST		/v1/integration/:orgId		@controllers.IntegrationController.addIntegration(orgId:Long)
 
 GET        /admin/metrics             com.kenshoo.play.metrics.MetricsController.metrics
 

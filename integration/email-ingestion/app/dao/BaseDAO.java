@@ -25,6 +25,6 @@ public class BaseDAO {
 	protected MongoCollection getCollection(String collection) {
         DB db = mongoClient.getDB("coredb");
         Jongo jongo = new Jongo(db);
-        return jongo.getCollection("bars");
+        return jongo.getCollection(collection);
 	}
 }
