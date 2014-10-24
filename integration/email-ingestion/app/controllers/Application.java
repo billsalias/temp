@@ -1,36 +1,18 @@
 package controllers;
 
-import play.libs.F.Function;
-import play.libs.Json;
 import play.mvc.Controller;
-import play.mvc.Result;
-import play.data.Form;
-import play.libs.Json;
-import play.libs.ws.WS;
 import play.mvc.Result;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.mongodb.DB;
 import com.mongodb.MongoClient;	
-
-import org.jongo.Jongo;
-import org.jongo.MongoCursor;
-import org.jongo.Mapper;
-import org.jongo.MongoCollection;
-
-import services.BarService;
-import models.Contact;
 import views.html.index;
-import utils.ExampleLogger;
 
 @org.springframework.stereotype.Component
 public class Application extends Controller {
 
-    private static final String CONNURI = "mongodb://localhost:27017/coredb?maxConnectionCount=10";
-
-	@Autowired
-    public BarService barService;
+//	@Autowired
+//    public BarService barService;
 	
 	@Autowired
 	private MongoClient mongoClient;
@@ -58,11 +40,8 @@ public class Application extends Controller {
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
 	}
-	
-	public static Result index2() {
-		return ok(index.render("Your new application is ready."));
-	}
 
+	/*
 	public Result listContact() throws Exception {
 		DB db = mongoClient.getDB("coredb");
 		Jongo jongo = new Jongo(db);
@@ -93,10 +72,27 @@ public class Application extends Controller {
         }
     }
 
+    public Result addBar(String name) throws Exception {
+        Bar newBar = new Bar();
+        newBar.name = name;
+        DB db = mongoClient.getDB("coredb");
+        Jongo jongo = new Jongo(db);
+        MongoCollection bars = jongo.getCollection("bars");
+        WriteResult result = bars.insert(newBar);
+        return ok(newBar._id + ":" + result.toString());
+    }
 
 	public Result listBars() {
-		return ok(Json.toJson(barService.getAllBars()));
+        DB db = mongoClient.getDB("coredb");
+        Jongo jongo = new Jongo(db);
+        MongoCollection bars = jongo.getCollection("bars");
+        MongoCursor<Bar> all = bars.find().as(Bar.class);
+        List<Bar> barList = new ArrayList<Bar>();
+        while ( all.hasNext() ) {
+        	barList.add(all.next());
+        }
+		return ok(Json.toJson(barList));
 	}
 	
-
+*/
 }

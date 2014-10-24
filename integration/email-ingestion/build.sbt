@@ -1,6 +1,8 @@
-name := "EmailIngestion"
+name := """EmailIngestion"""
 
 version := "0.9-SNAPSHOT"
+
+EclipseKeys.skipParents in ThisBuild := false
 
 scalaVersion := "2.11.2"
 
@@ -22,13 +24,11 @@ libraryDependencies ++= Seq(
 
 
 lazy val root = (project in file("."))
-.aggregate(common, api, client)
-.dependsOn(common, api, client)
+.aggregate(common, client)
+.dependsOn(common, client)
 .enablePlugins(PlayJava)
 
 lazy val common = project.in(file("modules/common")).enablePlugins(PlayJava)
-
-lazy val api = project.in(file("modules/api")).dependsOn(common).enablePlugins(PlayJava)
 
 lazy val client = project.in(file("modules/client"))
 
