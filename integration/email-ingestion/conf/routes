@@ -2,9 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET			/v1/integration/:orgId		@controllers.IntegrationController.listIntegrations(:orgId)
+GET			/v1/integration/:orgId		@controllers.IntegrationController.listIntegrations(:orgId,offset,batchSize)
 
-POST		/v1/integration/:orgId		@controllers.IntegrationController.listIntegrations(:orgId)
+POST		/v1/integration/:orgId		@controllers.IntegrationController.addIntegration(:orgId)
 
 # Home page
 GET        /                          controllers.Application.index()
