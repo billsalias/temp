@@ -3,6 +3,11 @@ import org.springframework.context.ApplicationContext;
 
 import play.GlobalSettings;
 import play.Application;
+import play.libs.F.Promise;
+import play.mvc.Http.RequestHeader;
+import play.mvc.Result;
+import play.mvc.SimpleResult;
+import static play.mvc.Results.*;
 
 public class Global extends GlobalSettings {
 
@@ -18,5 +23,11 @@ public class Global extends GlobalSettings {
 	@Override
 	public <A> A getControllerInstance(Class<A> clazz) {
 		return ctx.getBean(clazz);
+	}
+
+	@Override
+	public Promise<Result> onError(RequestHeader req, Throwable t) {
+		return Promise.<Result> pure(internalServerError(views.html.error
+				.render(t)));
 	}
 }
