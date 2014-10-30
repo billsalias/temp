@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import play.Logger;
 import play.libs.F.Promise;
 import play.libs.F.Function;
 import models.Integration;
@@ -59,8 +60,9 @@ public class IntegrationService {
                             throws Throwable {
                         // Check the validation results
                         for ( Boolean valid : validation ) {
-                            if ( !valid )
+                            if ( !valid ) {
                                 throw new IllegalArgumentException("Invalid id passed in Integration");
+                            }
                         }
 
                         // Save the update and validated integration to mongo

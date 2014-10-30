@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import play.GlobalSettings;
+import play.Logger;
 import play.libs.F.Promise;
 import play.libs.Json;
 import play.libs.F.Function;
@@ -60,6 +62,12 @@ public class IntegrationController extends Controller {
     }
 
     /**
+     * Add a new integration to the system. This is a complex and long running
+     * task dependent on multiple asynchronous operations so returns a promise
+     * instead of a direct result.
+     * 
+     * This call expects the post body to contain a JSON formatted Integration
+     * object.
      * 
      * @param orgId
      * @return
@@ -67,12 +75,18 @@ public class IntegrationController extends Controller {
     public Promise<Result> addIntegration(Long orgId) {
         // Get the new integration data
         JsonNode json = request().body().asJson();
-        
+
         // If the json is missing fail hard
         if (json == null) {
-            return Promise.<Result>pure(badRequest(Json.toJson(new ErrorResponse(
-                    ErrorResponse.Status.INVALID_ARGUMENT,
-                    "Post body expected to contain an Integration object!"))));
+            Logger.of(IntegrationController.class).error(
+                    "addIntegration not passed a valid integration in post body:"
+                            + request().body().asText());
+
+            return Promise
+                    .<Result> pure(badRequest(Json
+                            .toJson(new ErrorResponse(
+                                    ErrorResponse.Status.INVALID_ARGUMENT,
+                                    "Post body expected to contain an Integration object!"))));
         }
 
         // Convert the json to a pojo

@@ -4,10 +4,12 @@ import org.springframework.context.ApplicationContext;
 import controllers.ErrorResponse;
 import play.GlobalSettings;
 import play.Application;
+import play.Logger;
 import play.libs.Json;
 import play.libs.F.Promise;
 import play.mvc.Http.RequestHeader;
 import play.mvc.Result;
+import services.IntegrationService;
 import static play.mvc.Results.*;
 
 public class Global extends GlobalSettings {
@@ -31,6 +33,10 @@ public class Global extends GlobalSettings {
      */
     @Override
     public Promise<Result> onError(RequestHeader req, Throwable t) {
+        // Log the error
+        Logger.of(GlobalSettings.class).error("Unhandled exception in controller",t);
+        
+        // Report a standard error objects as json to the client
         return Promise.<Result> pure(internalServerError(Json
                 .toJson(new ErrorResponse(ErrorResponse.Status.EXCEPTION, t
                         .getMessage()))));
