@@ -1,0 +1,30 @@
+<html>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<body>
+
+<script type="text/javascript">
+var data = {
+	"schemaVersion": 1,
+	"organizationId": 1,
+	"status": "ACTIVE",
+	"templateId": 0,
+	"entryPointAddress": null,
+	"entryPointId": null,
+	"fromAdressFilter": null,
+	"andConditions": null,
+	"orConditions": null,
+	"variableMap": null
+};
+$.ajax({
+    type :  "POST",
+    dataType: 'json',
+	contentType: "application/json; charset=utf-8",
+    data: JSON.stringify(data),
+    url  :  "http://127.0.0.1:9000/v1/integration/1?EBI_AUTH_TOKEN=foo",
+	success: function(data){alert(data);},
+    failure: function(errMsg) {alert(errMsg);}
+});
+</script>
+</body>
+</html>
