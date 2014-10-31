@@ -37,7 +37,7 @@ public class IntegrationService {
     public Promise<Integration> addIntegration(final Integration newIntegration) {
         // verify the template id and variable ids asynchronously
         // Fake it for now, these will be asynchronous service calls to the EB
-        // API server through WS.
+        // API server through WS eventually.
         List<Promise<Boolean>> validators = new ArrayList<Promise<Boolean>>(3);
         validators.add(Promise.<Boolean> pure(Boolean.TRUE));
         validators.add(Promise.<Boolean> pure(Boolean.TRUE));
