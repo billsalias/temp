@@ -62,8 +62,12 @@ public class EBRestAPIConnectorService {
         return responsePromise.map(new Function<WSResponse, Boolean>() {
             public Boolean apply(WSResponse response) throws Throwable {
                 // Confirm the request completed successfully
-                if (response.getStatus() != 200)
+                if (response.getStatus() != 200) {
+                    Logger.of(EBRestAPIConnectorService.class).error(
+                            "validateTemplate bad response code:" + response.toString());
+                    
                     return false;
+                }
 
                 // Parse the data into json
                 JsonNode json = response.asJson();

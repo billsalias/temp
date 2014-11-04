@@ -3,28 +3,34 @@
 
 <body>
 
+<button id="addInt">Add Integration</button>
 <script type="text/javascript">
 var data = {
-	"schemaVersion": 1,
-	"organizationId": 1,
-	"status": "ACTIVE",
-	"templateId": 0,
-	"entryPointAddress": null,
-	"entryPointId": null,
-	"fromAdressFilter": null,
-	"andConditions": null,
-	"orConditions": null,
-	"variableMap": null
+    "schemaVersion": 1,
+    "organizationId": 8800387991394,
+    "status": "ACTIVE",
+    "templateId": 4402341481837,
+    "entryPointAddress": "bill-8800387991394@sandboxd15cd6bc7274406f884f7f84de776fb9.mailgun.org",
+    "entryPointId": null,
+    "fromAdressFilter": null,
+    "andConditions": null,
+    "orConditions": null,
+    "variableMap": null
 };
-$.ajax({
-    type :  "POST",
-    dataType: 'json',
-	contentType: "application/json; charset=utf-8",
-    data: JSON.stringify(data),
-    url  :  "http://127.0.0.1:9000/v1/integration/1?EBI_AUTH_TOKEN=foo",
-	success: function(data){alert(data);},
-    failure: function(errMsg) {alert(errMsg);}
-});
+function newIntegration() {
+    $.ajax({
+        type :  "POST",
+        dataType: 'json',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(data),
+        url  :  "http://127.0.0.1:9000/v1/integration/1?EBI_AUTH_TOKEN=foo",
+        success: function(data){
+        	alert(data);},
+        error: function(jqXHR,textStatus,errorThrown) {
+        	alert(jqXHR.responseText);}
+    });
+}
+$("#addInt").click(newIntegration);
 </script>
 </body>
 </html>

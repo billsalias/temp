@@ -9,8 +9,9 @@
 	<context:component-scan base-package="controllers,services,models,dao" />
 	
 	<bean id="mailgunService" class="services.MailgunAPIConnectorService">
-       <property name="apiBaseURL" value="https://api.mailgun.net/v2/sandboxd15cd6bc7274406f884f7f84de776fb9.mailgun.org"/>
+       <property name="apiBaseURL" value="https://api.mailgun.net/v2/"/>
        <property name="apiKey" value="key-d964d9c4d3e726093a6ef56ff9e5de3c"/>
+       <property name="domain" value="sandboxd15cd6bc7274406f884f7f84de776fb9.mailgun.org"/>
 	</bean>
 	
     <bean id="ebAPIService" class="services.EBRestAPIConnectorService">
