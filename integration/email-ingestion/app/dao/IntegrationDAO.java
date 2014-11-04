@@ -17,6 +17,15 @@ import models.Integration;
  */
 @Service("integrationDAO")
 public class IntegrationDAO extends BaseDAO {
+    /** The name of the collection this DAO manages */
+    public static final String COLLECTION = "integration";
+
+    @Override
+    public String getCollectionName() {
+        // TODO Auto-generated method stub
+        return COLLECTION;
+    }
+    
 	/**
 	 * Insert the passed Integration into the integration collection. If no _id
 	 * is set one will be allocated, if one is set it will be respected.
@@ -26,7 +35,7 @@ public class IntegrationDAO extends BaseDAO {
 	 *         input.
 	 */
 	public Integration insert(Integration integration) {
-		getCollection("integration").insert(integration);
+		getCollection().insert(integration);
 		return integration;
 	}
 
@@ -42,7 +51,7 @@ public class IntegrationDAO extends BaseDAO {
 	 * @return A list of integration objects.
 	 */
 	public List<Integration> listIntegrations(long orgId, int offset, int batchSize) {
-		MongoCursor<Integration> cursor = getCollection("integration").find("{organizationId:#}", orgId)
+		MongoCursor<Integration> cursor = getCollection().find("{organizationId:#}", orgId)
 				.sort("{id:1}").skip(offset).limit(batchSize)
 				.as(Integration.class);
 		List<Integration> list = new ArrayList<Integration>();

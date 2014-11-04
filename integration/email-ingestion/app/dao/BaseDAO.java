@@ -14,21 +14,29 @@ import com.mongodb.MongoClient;
  * @author bill.clogston
  *
  */
-public class BaseDAO {
-	@Resource
-	private MongoClient mongoClient;
+public abstract class BaseDAO {
+    @Resource
+    private MongoClient mongoClient;
 
-	/**
-	 * This method abstracts the details of accessing a collection from the
-	 * mongo database,
-	 * 
-	 * @param collection
-	 *            The name of the collection to access.
-	 * @return The MongoCollection instance to access the desired collection.
-	 */
-	protected MongoCollection getCollection(String collection) {
-		DB db = mongoClient.getDB("coredb");
-		Jongo jongo = new Jongo(db);
-		return jongo.getCollection(collection);
-	}
+    /**
+     * Implement this method when subclassing to tell this class the name of the
+     * collection to work with.
+     * 
+     * @return
+     */
+    public abstract String getCollectionName();
+
+    /**
+     * This method abstracts the details of accessing a collection from the
+     * mongo database,
+     * 
+     * @param collection
+     *            The name of the collection to access.
+     * @return The MongoCollection instance to access the desired collection.
+     */
+    protected MongoCollection getCollection() {
+        DB db = mongoClient.getDB("coredb");
+        Jongo jongo = new Jongo(db);
+        return jongo.getCollection(getCollectionName());
+    }
 }

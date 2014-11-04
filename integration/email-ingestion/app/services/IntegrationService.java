@@ -1,17 +1,19 @@
 package services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import models.Integration;
+import models.IntegrationEntryPoint;
+
 import org.springframework.stereotype.Service;
 
-import play.Logger;
-import play.libs.F.Promise;
 import play.libs.F.Function;
-import models.Integration;
+import play.libs.F.Function0;
+import play.libs.F.Promise;
 import dao.IntegrationDAO;
+import dao.IntegrationEntryPointDAO;
 
 /**
  * This class provides methods for working with Integrations and
@@ -23,8 +25,17 @@ import dao.IntegrationDAO;
  */
 @Service("integrationService")
 public class IntegrationService {
+    @Resource(name = "mailgunService")
+    private MailgunAPIConnectorService mailgunService;
+
+    @Resource(name = "ebAPIService")
+    private EBRestAPIConnectorService ebAPIService;
+
     @Resource(name = "integrationDAO")
     private IntegrationDAO integrationDAO;
+
+    @Resource(name = "integrationEntryPointDAO")
+    private IntegrationEntryPointDAO entryPointDAO;
 
     /**
      * Add a new integration to mongo. Before adding the integration we will
@@ -36,37 +47,78 @@ public class IntegrationService {
      */
     public Promise<Integration> addIntegration(final Integration newIntegration) {
         // verify the template id and variable ids asynchronously
-        // Fake it for now, these will be asynchronous service calls to the EB
-        // API server through WS eventually.
-        List<Promise<Boolean>> validators = new ArrayList<Promise<Boolean>>(3);
-        validators.add(Promise.<Boolean> pure(Boolean.TRUE));
-        validators.add(Promise.<Boolean> pure(Boolean.TRUE));
-        validators.add(Promise.<Boolean> pure(Boolean.TRUE));
+        Promise<Boolean> validator = ebAPIService.validateTemplate(
+                newIntegration.organizationId, newIntegration.templateId, null);
 
-        // See if there is an existing integration entry point that matches the
-        // new integration destination email address
-
-        // If there is an existing entry point use it, if not create one
-
-        // Update the entry point id in the new integration
-
-        // Wait for asynchronous validations to complete then complete the
-        // insert
-        Promise<List<Boolean>> validationResults = Promise
-                .<Boolean> sequence(validators);
-        Promise<Integration> result = validationResults
-                .map(new Function<List<Boolean>, Integration>() {
-                    public Integration apply(List<Boolean> validation)
+        // Wait for asynchronous validations to complete then based on status
+        // continue the add process
+        Promise<Integration> result = validator
+                .flatMap(new Function<Boolean, Promise<Integration>>() {
+                    public Promise<Integration> apply(Boolean valid)
                             throws Throwable {
                         // Check the validation results
-                        for ( Boolean valid : validation ) {
-                            if ( !valid ) {
-                                throw new IllegalArgumentException("Invalid id passed in Integration");
-                            }
+                        if (!valid) {
+                            throw new IllegalArgumentException(
+                                    "Invalid id passed in Integration");
                         }
 
-                        // Save the update and validated integration to mongo
-                        return integrationDAO.insert(newIntegration);
+                        // See if there is an existing integration entry point
+                        // that matches the new integration destination email
+                        // address
+                        IntegrationEntryPoint entryPoint = entryPointDAO
+                                .findByEmail(newIntegration.entryPointAddress);
+
+                        // If there is an existing entry point use it, if not
+                        // create one
+                        Promise<IntegrationEntryPoint> newEP;
+                        if (entryPoint != null) {
+                            // Create a promise with the already found value
+                            newEP = Promise
+                                    .<IntegrationEntryPoint> pure(entryPoint);
+                        } else {
+                            // Need to create one, first step add a route for it
+                            // to mailgun
+                            newEP = mailgunService
+                                    .addRouteForEmail(
+                                            newIntegration.entryPointAddress)
+                                    // Map the added route id to the new entry
+                                    // point
+                                    .map(new Function<String, IntegrationEntryPoint>() {
+                                        public IntegrationEntryPoint apply(
+                                                String routeId)
+                                                throws Throwable {
+                                            // Got the new route id, insert it
+                                            // into the DB
+                                            IntegrationEntryPoint entryPoint = new IntegrationEntryPoint();
+                                            entryPoint.organizationId = newIntegration.organizationId;
+                                            entryPoint.entryPointAddress = newIntegration.entryPointAddress;
+                                            entryPoint.status = IntegrationEntryPoint.Status.ACTIVE;
+                                            entryPoint.token = routeId;
+                                            entryPointDAO.insert(entryPoint);
+
+                                            // Finally return the new entry
+                                            // point
+                                            return entryPoint;
+                                        }
+                                    });
+                        }
+
+                        // once we have the new entry point we can complete the
+                        // insert of the Integration
+                        return newEP
+                                .map(new Function<IntegrationEntryPoint, Integration>() {
+                                    public Integration apply(
+                                            IntegrationEntryPoint entryPoint) {
+                                        // Update the entry point id in the new
+                                        // integration
+                                        newIntegration.entryPointId = entryPoint._id;
+
+                                        // Save the update and validated
+                                        // integration to mongo
+                                        return integrationDAO
+                                                .insert(newIntegration);
+                                    }
+                                });
                     }
                 });
 

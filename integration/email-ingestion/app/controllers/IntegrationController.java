@@ -1,24 +1,21 @@
 package controllers;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import models.Integration;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import play.GlobalSettings;
 import play.Logger;
+import play.libs.F.Function;
 import play.libs.F.Promise;
 import play.libs.Json;
-import play.libs.F.Function;
 import play.mvc.Controller;
 import play.mvc.Result;
 import services.IntegrationService;
 import services.SecurityService;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * This controller handles all methods for managing and accessing integrations

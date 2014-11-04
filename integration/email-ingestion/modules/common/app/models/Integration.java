@@ -85,6 +85,9 @@ public class Integration {
     /** The schema version used when this object was created. **/
     public int schemaVersion = EXPECTED_SCHEMA_VERSION;
 
+    /** The contact id of the owner of this integration. **/
+    public long ownerId;
+
     /** The organization this integration is associated with. **/
     public long organizationId;
 

@@ -8,6 +8,18 @@
 
 	<context:component-scan base-package="controllers,services,models,dao" />
 	
+	<bean id="mailgunService" class="services.MailgunAPIConnectorService">
+       <property name="apiBaseURL" value="https://api.mailgun.net/v2/sandboxd15cd6bc7274406f884f7f84de776fb9.mailgun.org"/>
+       <property name="apiKey" value="key-d964d9c4d3e726093a6ef56ff9e5de3c"/>
+	</bean>
+	
+    <bean id="ebAPIService" class="services.EBRestAPIConnectorService">
+    <!-- Until the API server is updated to use proxy user this is a regular user name and password -->
+       <property name="proxyUser" value="bill.clogston@everbridge.com"/>
+       <property name="proxyPasswordHash" value="Iwass3cur3"/>
+       <property name="apiBaseURL" value="https://api-qa1.everbridge.net/rest"/>
+    </bean>
+    
 	<bean id="mongoClient" class="com.mongodb.MongoClient">
 		<constructor-arg>
 			<!-- ServerAddress -->

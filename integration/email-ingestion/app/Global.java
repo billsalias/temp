@@ -1,16 +1,16 @@
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.ApplicationContext;
+import static play.mvc.Results.internalServerError;
 
-import controllers.ErrorResponse;
-import play.GlobalSettings;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import play.Application;
+import play.GlobalSettings;
 import play.Logger;
-import play.libs.Json;
 import play.libs.F.Promise;
+import play.libs.Json;
 import play.mvc.Http.RequestHeader;
 import play.mvc.Result;
-import services.IntegrationService;
-import static play.mvc.Results.*;
+import controllers.ErrorResponse;
 
 public class Global extends GlobalSettings {
 
@@ -34,7 +34,8 @@ public class Global extends GlobalSettings {
     @Override
     public Promise<Result> onError(RequestHeader req, Throwable t) {
         // Log the error
-        Logger.of(GlobalSettings.class).error("Unhandled exception in controller",t);
+        Logger.of(GlobalSettings.class).error(
+                "Unhandled exception in controller", t);
         
         // Report a standard error objects as json to the client
         return Promise.<Result> pure(internalServerError(Json
