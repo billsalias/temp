@@ -91,6 +91,8 @@ public class EBRestAPIConnectorService {
                             || templateVarsNode.size() == 0)
                         return false;
 
+                    // TODO: Check for required variables that have no mapping
+                    
                     // Scan the templates variables and make sure all the passed
                     // ones are present
                     Iterator<JsonNode> ite = templateVarsNode.elements();

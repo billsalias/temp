@@ -2,8 +2,6 @@ package services;
 
 import java.util.Iterator;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import play.Logger;
 import play.libs.F.Function;
 import play.libs.F.Promise;
@@ -11,6 +9,8 @@ import play.libs.ws.WS;
 import play.libs.ws.WSAuthScheme;
 import play.libs.ws.WSRequestHolder;
 import play.libs.ws.WSResponse;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * This service provides methods to interact with the mailgun service to manage
@@ -40,7 +40,7 @@ public class MailgunAPIConnectorService {
     /**
      * This method will add a route for the specified email address to post to
      * this server. If successful the id of the new route will be returned. If a
-     * route already exists for this email address or the address is not valud
+     * route already exists for this email address or the address is not valid
      * and exception will be thrown.
      * 
      * @param email
@@ -48,41 +48,78 @@ public class MailgunAPIConnectorService {
      * @return A promise for the ID of the new route
      */
     Promise<String> addRouteForEmail(String email) {
+        // The proposed route expression and action
+        final String routeFilter = "match_recipient(\"" + email + "\")";
+        final String routeAction = "store(notify=\"http://requestb.in/14inus71\")";
+
         // List existing routes to make sure this is not a duplicate
-        WSRequestHolder listRoutes = WS.url(getApiBaseURL() + "/v2/routes");
+        WSRequestHolder listRoutes = WS.url(getApiBaseURL() + "routes");
         listRoutes.setAuth("api", getApiKey(), WSAuthScheme.BASIC);
         Promise<WSResponse> routesResponse = listRoutes.get();
 
-        // Map the existing routes response to a call to add a new route if
-        // appropriate
-        routesResponse.map(new Function<WSResponse, WSResponse>() {
-            public WSResponse apply(WSResponse routes) throws Throwable {
-                // Confirm the request completed successfully
-                if (routes.getStatus() != 200) {
-                    Logger.of(EBRestAPIConnectorService.class).error(
-                            "validateTemplate bad response code:"
-                                    + routes.toString());
+        // Map the existing routes response to a boolean indicating if it exists
+        // already
+        Promise<Boolean> routeExists = routesResponse
+                .map(new Function<WSResponse, Boolean>() {
+                    public Boolean apply(WSResponse routes) throws Throwable {
+                        // Confirm the request completed successfully
+                        if (routes.getStatus() != 200) {
+                            Logger.of(EBRestAPIConnectorService.class).error(
+                                    "validateTemplate bad response code:"
+                                            + routes.toString());
 
-                    // Bad response
-                    // TODO: Create appropriate exception
-                    throw new Exception("Bad response from mailgun server");
-                }
+                            // Bad response
+                            // TODO: Create appropriate exception
+                            throw new Exception(
+                                    "Bad response from mailgun server");
+                        }
 
-                // Parse the data into json
-                JsonNode json = routes.asJson();
+                        // Parse the data into json
+                        JsonNode json = routes.asJson();
 
-                // Find the variables in this template
-                JsonNode items = json.get("items");
+                        // Find the existing routes
+                        JsonNode items = json.get("items");
 
+                        // If there are routes scan them
+                        if (items != null && !items.isNull()
+                                && items.size() > 0) {
+
+                            // Scan the routes and make sure none use this
+                            // address
+                            Iterator<JsonNode> ite = items.elements();
+                            while (ite.hasNext()) {
+                                // Found one with the same expression, report it
+                                String expression = ite.next().asText();
+                                if (routeFilter.equals(expression)) {
+                                    Logger.of(EBRestAPIConnectorService.class)
+                                            .error("route exists in mailgun but not mongo:"
+                                                    + routeFilter);
+
+                                    // TODO: Create appropriate exception
+                                    throw new Exception(
+                                            "route exists in mailgun but not mongo:"
+                                                    + routeFilter);
+                                }
+                            }
+                        }
+
+                        return false;
+                    }
+
+                });
+
+        // Map the add route response to return the new route id
+        return routeExists.map(new Function<Boolean, String>() {
+            public String apply(Boolean found) throws Throwable {
+                WSRequestHolder addRoute = WS.url(getApiBaseURL() + "routes");
+                addRoute.setAuth("api", getApiKey(), WSAuthScheme.BASIC);
+                Promise<WSResponse> routesResponse = addRoute.setContentType(
+                        "application/x-www-form-urlencoded").post(
+                        "key1=value1&key2=value2");
                 return null;
             }
 
         });
-
-        // Map the add route response to return the new route id
-
-        // OR just fake it for now
-        return Promise.<String> pure("testid");
     }
 
     // PROPERTIES
